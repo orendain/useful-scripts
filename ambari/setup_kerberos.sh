@@ -77,7 +77,7 @@ create_payload()
           \"password_min_digits\": \"1\",
           \"password_min_punctuation\": \"1\",
           \"password_min_whitespace\": \"0\",
-          \"service_check_principal_name\" : \"${cluster_name}-${short_date}\",
+          \"service_check_principal_name\" : \"\${cluster_name|toLower()}-\${short_date}\",
           \"case_insensitive_username_rules\" : \"false\"
         }
       }
