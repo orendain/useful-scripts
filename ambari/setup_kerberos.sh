@@ -120,7 +120,7 @@ configure_kerberos()
   sleep 60
   echo -e "\n`ts` Stopping all the services"
   # Find and save the Ambari components currently started
-  startedComponents=($(curl -uadmin:admin "http://sandbox.hortonworks.com:8080/api/v1/clusters/Sandbox/host_components?HostRoles/state=STARTED&minimal_response=true" | grep -Po 'component_name" : "(.*?)"' | cut -d: -f2 | sed 's/[\ "]//g'))
+  #startedComponents=($(curl -uadmin:admin "http://sandbox.hortonworks.com:8080/api/v1/clusters/Sandbox/host_components?HostRoles/state=STARTED&minimal_response=true" | grep -Po 'component_name" : "(.*?)"' | cut -d: -f2 | sed 's/[\ "]//g'))
   curl -H "X-Requested-By:ambari" -u $AMBARI_ADMIN_USER:$AMBARI_ADMIN_PASSWORD -i -X PUT -d '{"ServiceInfo": {"state" : "INSTALLED"}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services
   echo -e "\n`ts` Sleeping for 3 minutes"
   sleep 180
@@ -129,11 +129,15 @@ configure_kerberos()
   curl -H "X-Requested-By:ambari" -u $AMBARI_ADMIN_USER:$AMBARI_ADMIN_PASSWORD -i -X PUT -d @$LOC/credentials_payload http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME
   echo -e "\n`ts` Restarting services after 2 minutes..Please be patient :)"
   sleep 120
-  for component in ${startedComponents[@]}
-  do
-    curl -H "X-Requested-By:ambari" -u $AMBARI_ADMIN_USER:$AMBARI_ADMIN_PASSWORD -i -X PUT -d '{"RequestInfo": {"context": "Start '"$component"'"}, "HostRoles": {"state": "STARTED"}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/host_components/$component
-    sleep 1
-  done
+
+  # Added, but commenting out for speedier debug trials
+  #for component in ${startedComponents[@]}
+  #do
+  #  curl -H "X-Requested-By:ambari" -u $AMBARI_ADMIN_USER:$AMBARI_ADMIN_PASSWORD -i -X PUT -d '{"RequestInfo": {"context": "Start# '"$component"'"}, "HostRoles": {"state": "STARTED"}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/host_components/$component
+  #  sleep 1
+  #done
+
+  curl -H "X-Requested-By:ambari" -u $AMBARI_ADMIN_USER:$AMBARI_ADMIN_PASSWORD -i -X PUT -d '{"ServiceInfo": {"state" : "STARTED"}}' http://$AMBARI_HOST:8080/api/v1/clusters/$CLUSTER_NAME/services
 
   echo -e "\n`ts` Please check Ambari UI\nThank You! :)"
 }
